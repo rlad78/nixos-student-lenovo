@@ -1,5 +1,9 @@
 { config, pkgs, ... }:
 {
+  imports = [
+    ./users
+  ];
+
   # enable flakes
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
@@ -28,15 +32,15 @@
   services.xserver.enable = true;
 
   # Configure keymap
-  services.xserver = {
+  services.xserver.xkb = {
     layout = "us";
-    xkbVariant = "";
+    variant = "";
   };
 
   # Enable the KDE Plasma Desktop Environment.
   services.desktopManager.plasma6.enable = true;
-  services.xserver.displayManager.sddm.enable = true;
-  services.xserver.displayManager.sddm.wayland.enable = true;
+  services.displayManager.sddm.enable = true;
+  services.displayManager.sddm.wayland.enable = true;
 
   # Enable CUPS to print documents.
   services.printing.enable = true;
@@ -62,16 +66,15 @@
   # services.xserver.libinput.enable = true;
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
-  users.users.rcarte4 = {
-    isNormalUser = true;
-    description = "Richard Lee Carter Jr";
-    extraGroups = [ "networkmanager" "wheel" ];
-    packages = with pkgs; [
-      firefox
-      kate
-    #  thunderbird
-    ];
-  };
+  # users.users.rcarte4 = {
+    # isNormalUser = true;
+    # description = "Richard Lee Carter Jr";
+    # extraGroups = [ "networkmanager" "wheel" ];
+    # packages = with pkgs; [
+      # firefox
+      # kate
+    # ];
+  # };
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
@@ -80,8 +83,20 @@
   # $ nix search wget
   environment.systemPackages = with pkgs; [
     git
+    spacevim
+    lazygit
     # vim
   ];
+
+  environment.shellAliases = {
+    sv = "spacevim";
+    lzgit = "lazygit";
+  };
+
+  programs.nh = {
+    enable = true;
+    flake = "/home/rcarte4/lenovo";
+  };
 
   programs.neovim = {
     enable = true;

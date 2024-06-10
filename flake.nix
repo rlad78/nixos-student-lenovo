@@ -1,27 +1,36 @@
 {
-  outputs = { self, nixpkgs, flake-utils, home-manager }: with flake-utils.lib; (
-    eachSystem [ system.x86_64-linux system.aarch64-linux ] (system: {
+  outputs = { self, nixpkgs, home-manager }:
+  let
+    laptop-hostnames = [ "ASG-NTSST1-L13" "ASG-NTSST2-L13" ];
+    forEach = nixpkgs.lib.lists.forEach;
 
-      nixosConfigurations = let
-        hostnames = [ "ASG-NTSST1-L13" "ASG-NTSST2-L13" "student-test-vm" ];
-        forEach = nixpkgs.lib.lists.forEach;
-
-        standard-config = host: ({
-          specialArgs = rec {
-            pkgs = import nixpkgs {
-              system = system;
-              config.allowUnfree = true;
-            };
+    laptop-config = host: ({
+      specialArgs = {
+        pkgs = import nixpkgs {
+          system = "x86_64-linux";
+          config.allowUnfree = true;
+        };
+      };
+      modules = [ ( ./. + "/hosts/${host}" ) ];
+    });
+  in
+  {
+    nixosConfigurations = {
+      "student-test-vm" = nixpkgs.lib.nixosSystem {
+        specialArgs = {
+          pkgs = import nixpkgs {
+            system = "aarch64-linux";
+            config.allowUnfree = true;
           };
-          modules = [ "./hosts/${host}" ];
-        });
-      in 
-        builtins.listToAttrs (forEach hostnames (host:
-          { 
-            name = host;
-            value = nixpkgs.lib.nixosSystem (standard-config host);
-          }
-        ));
-    })
-  );
+          inherit home-manager;
+        };
+        modules = [ ( ./. + "/hosts/student-test-vm" ) ];
+      };
+    } // builtins.listToAttrs (forEach laptop-hostnames (host:
+      {
+        name = host;
+        value = nixpkgs.lib.nixosSystem (laptop-config host);
+      }
+    ));
+  };
 }
