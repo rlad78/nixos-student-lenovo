@@ -1,8 +1,8 @@
-{ config, pkgs, home-manager, ... }:
+{ config, pkgs, lib, home-manager, ... }:
 let
-  laptop-users = import ./const/users-list.nix;
+  laptop-users = import ./users-list.nix;
 in
-homelib.attrsets.concatMapAttrs (username: values: {
+lib.attrsets.concatMapAttrs (username: values: {
   ${username} = {
     home.username = username;
     home.homeDirectory = "/home/${username}";
@@ -11,9 +11,9 @@ homelib.attrsets.concatMapAttrs (username: values: {
       firefox
       chromium
       kate
-    ]
+    ];
 
     home.stateVersion = "24.11";
     programs.home-manager.enable = true;
   };
-}) laptop-users;
+}) laptop-users

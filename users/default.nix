@@ -1,6 +1,6 @@
 { config, pkgs, lib, home-manager, ... }:
 let
-  laptop-users = import ./const/users-list.nix;
+  laptop-users = import ./users-list.nix;
 in
 {
   imports = [ 
